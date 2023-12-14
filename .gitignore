@@ -77,3 +77,4 @@ config/*
 /custom_components/__init__.py
 /test*.py
 secrets.yaml
+.DS_Store
