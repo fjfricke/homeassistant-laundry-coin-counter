@@ -6,25 +6,21 @@ This module defines sensors for tracking coins, washes, and dries.
 
 from homeassistant.components.sensor import SensorEntity
 
-from .const import CONF_COIN_VALUE, CONF_DRY_COST, CONF_WASH_COST, DOMAIN
 
-
-def setup_platform(hass, config, add_entities, discovery_info=None):
-    """Set up the sensor platform."""
-    if discovery_info is None:
-        return
-
-    coin_value = hass.data[DOMAIN][discovery_info[CONF_COIN_VALUE]]
-    wash_cost = hass.data[DOMAIN][discovery_info[CONF_WASH_COST]]
-    dry_cost = hass.data[DOMAIN][discovery_info[CONF_DRY_COST]]
+async def async_setup_entry(hass, config_entry, async_add_entities):
+    """Set up the sensor platform from a config entry."""
+    # You can retrieve your config values from the config_entry object
+    coin_value = config_entry.data.get("coin_value")
+    wash_cost = config_entry.data.get("wash_cost")
+    dry_cost = config_entry.data.get("dry_cost")
 
     sensors = [
-        LaundrySensor(hass, coin_value, wash_cost, dry_cost, "Coins Available"),
-        LaundrySensor(hass, coin_value, wash_cost, dry_cost, "Washes Remaining"),
-        LaundrySensor(hass, coin_value, wash_cost, dry_cost, "Dries Remaining"),
+        LaundrySensor(coin_value, wash_cost, dry_cost, "Coins Available"),
+        LaundrySensor(coin_value, wash_cost, dry_cost, "Washes Remaining"),
+        LaundrySensor(coin_value, wash_cost, dry_cost, "Dries Remaining"),
     ]
 
-    add_entities(sensors, True)
+    async_add_entities(sensors)
 
 
 class LaundrySensor(SensorEntity):
