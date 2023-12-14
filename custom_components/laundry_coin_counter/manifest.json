@@ -1,0 +1,12 @@
+{
+    "domain": "launry_coin_counter",
+    "name": "Laundry Coin Counter",
+    "documentation": "https://github.com/fjfricke/homeassistant-laundry-coin-counter",
+    "dependencies": [],
+    "codeowners": [
+        "@fjfricke"
+    ],
+    "requirements": [],
+    "config_flow": true,
+    "version": "0.0.1"
+}
