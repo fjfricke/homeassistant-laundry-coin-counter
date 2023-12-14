@@ -1,5 +1,5 @@
 {
-    "domain": "launry_coin_counter",
+    "domain": "laundry_coin_counter",
     "name": "Laundry Coin Counter",
     "documentation": "https://github.com/fjfricke/homeassistant-laundry-coin-counter",
     "dependencies": [],
