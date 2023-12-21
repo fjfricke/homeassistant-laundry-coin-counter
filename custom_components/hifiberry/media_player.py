@@ -1,33 +1,26 @@
 """Hifiberry Platform."""
 import logging
-from datetime import timedelta
 
-from homeassistant.components.media_player import MediaPlayerEntity, MediaType
+from mpd.asyncio import MPDClient
+from pyhifiberry.audiocontrol2sio import Audiocontrol2SIO
+
+from homeassistant.components.media_player import MediaPlayerEntity
 from homeassistant.components.media_player.const import (
     MEDIA_TYPE_MUSIC,
     SUPPORT_NEXT_TRACK,
     SUPPORT_PAUSE,
     SUPPORT_PLAY,
+    SUPPORT_PLAY_MEDIA,
     SUPPORT_PREVIOUS_TRACK,
     SUPPORT_STOP,
+    SUPPORT_TURN_OFF,
     SUPPORT_VOLUME_MUTE,
     SUPPORT_VOLUME_SET,
     SUPPORT_VOLUME_STEP,
-    SUPPORT_TURN_OFF,
-    SUPPORT_PLAY_MEDIA
 )
-from homeassistant.const import (
-    STATE_IDLE,
-    STATE_PAUSED,
-    STATE_PLAYING,
-)
-from pyhifiberry.audiocontrol2 import Audiocontrol2Exception, LOGGER
-from pyhifiberry.audiocontrol2sio import Audiocontrol2SIO
+from homeassistant.const import STATE_IDLE, STATE_PAUSED, STATE_PLAYING
 
-import mpd
-from mpd.asyncio import MPDClient
-
-from .const import DATA_HIFIBERRY, DATA_INIT, DOMAIN
+from .const import DATA_HIFIBERRY, DOMAIN
 
 SUPPORT_HIFIBERRY = (
     SUPPORT_PAUSE
@@ -55,7 +48,9 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     base_url = f"http://{config_entry.data['host']}:{config_entry.data['port']}"
     mpd_server = f"http://{config_entry.data['host']}"
     mpd_port = "6600"
-    entity = HifiberryMediaPlayer(audiocontrol2, uid, name, base_url, mpd_server, mpd_port)
+    entity = HifiberryMediaPlayer(
+        audiocontrol2, uid, name, base_url, mpd_server, mpd_port
+    )
     async_add_entities([entity])
 
 
@@ -64,7 +59,9 @@ class HifiberryMediaPlayer(MediaPlayerEntity):
 
     should_poll = False
 
-    def __init__(self, audiocontrol2: Audiocontrol2SIO, uid, name, base_url, mpd_server, mpd_port):
+    def __init__(
+        self, audiocontrol2: Audiocontrol2SIO, uid, name, base_url, mpd_server, mpd_port
+    ):
         """Initialize the media player."""
         self._audiocontrol2 = audiocontrol2
         self._uid = uid
@@ -102,7 +99,7 @@ class HifiberryMediaPlayer(MediaPlayerEntity):
 
     async def async_added_to_hass(self) -> None:
         """Run when this Entity has been added to HA."""
-        await self._audiocontrol2.volume.get()      ### make sure volume percent is set
+        await self._audiocontrol2.volume.get()  ### make sure volume percent is set
         self._audiocontrol2.metadata.add_callback(self.schedule_update_ha_state)
         self._audiocontrol2.volume.add_callback(self.schedule_update_ha_state)
 
@@ -214,11 +211,15 @@ class HifiberryMediaPlayer(MediaPlayerEntity):
 
     async def async_volume_up(self):
         """Service to send the hifiberry the command for volume up."""
-        await self._audiocontrol2.volume.set(min(100, self._audiocontrol2.volume.percent + 5))
+        await self._audiocontrol2.volume.set(
+            min(100, self._audiocontrol2.volume.percent + 5)
+        )
 
     async def async_volume_down(self):
         """Service to send the hifiberry the command for volume down."""
-        await self._audiocontrol2.volume.set(max(0, self._audiocontrol2.volume.percent - 5))
+        await self._audiocontrol2.volume.set(
+            max(0, self._audiocontrol2.volume.percent - 5)
+        )
 
     async def async_set_volume_level(self, volume):
         """Send volume_set command to media player."""

@@ -4,13 +4,14 @@ from __future__ import annotations
 import logging
 from typing import Any
 
+from pyhifiberry.audiocontrol2sio import Audiocontrol2SIO
+from pyhifiberry.socketio_v5.exceptions import ConnectionError
 import voluptuous as vol
+
 from homeassistant import config_entries, data_entry_flow
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers.typing import DiscoveryInfoType
-from pyhifiberry.audiocontrol2sio import Audiocontrol2SIO
-from pyhifiberry.socketio_v5.exceptions import ConnectionError
 
 from .const import DOMAIN
 
@@ -19,7 +20,7 @@ _LOGGER = logging.getLogger(__name__)
 
 async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str, Any]:
     """Validate the user input allows us to connect."""
-    
+
     await Audiocontrol2SIO.connect(host=data["host"], port=data["port"])
 
 
@@ -43,7 +44,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             }
         )
 
-    async def async_step_zeroconf(self, discovery_info: DiscoveryInfoType) -> data_entry_flow.FlowResult:
+    async def async_step_zeroconf(
+        self, discovery_info: DiscoveryInfoType
+    ) -> data_entry_flow.FlowResult:
         """Zeroconf detects hifiberry, but we don't have enough informatio to create entry."""
         await self.async_set_unique_id(discovery_info.host)
         self._abort_if_unique_id_configured()
@@ -56,13 +59,13 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     ) -> FlowResult:
         """Handle the initial step."""
         if user_input is None:
-            return self.async_show_form(
-                step_id="user", data_schema=self.schema
-            )
+            return self.async_show_form(step_id="user", data_schema=self.schema)
 
         errors = {}
 
-        await self.async_set_unique_id(user_input['host'])  # This should be future "rpi serial" from https://github.com/hifiberry/audiocontrol2/pull/17
+        await self.async_set_unique_id(
+            user_input["host"]
+        )  # This should be future "rpi serial" from https://github.com/hifiberry/audiocontrol2/pull/17
         self._abort_if_unique_id_configured()
 
         try:

@@ -3,12 +3,13 @@ from __future__ import annotations
 
 import logging
 
+from pyhifiberry.audiocontrol2sio import Audiocontrol2SIO
+
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
-from pyhifiberry.audiocontrol2sio import Audiocontrol2SIO
 
-from .const import DATA_HIFIBERRY, DATA_INIT, DOMAIN
+from .const import DATA_HIFIBERRY, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -18,8 +19,8 @@ PLATFORMS = ["media_player"]
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up hifiberry from a config entry."""
     try:
-        host=entry.data["host"]
-        port=entry.data["port"]
+        host = entry.data["host"]
+        port = entry.data["port"]
         api = await Audiocontrol2SIO.connect(host, port)
     except Exception as error:
         raise ConfigEntryNotReady from error
